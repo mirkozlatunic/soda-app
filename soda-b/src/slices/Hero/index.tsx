@@ -1,7 +1,7 @@
 "use client";
 
 import { asText, Content } from "@prismicio/client";
-import { PrismicNextImage, PrismicNextLink } from "@prismicio/next";
+import { PrismicNextImage } from "@prismicio/next";
 import { PrismicRichText, SliceComponentProps } from "@prismicio/react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -45,12 +45,27 @@ const Hero = ({ slice }: HeroProps): JSX.Element => {
           delay: 0.3,
           stagger: 1,
         })
-        .from(".hero-subheading", { opacity: 0, y: 30 }, "+=.8")
-        .from(".hero-body", { opacity: 0, y: 10 })
-        .from(".hero-button", { opacity: 0, y: 10, duration: 0.6 });
+        .from(
+          ".hero-subheading",
+          {
+            opacity: 0,
+            y: 30,
+          },
+          "+=.8",
+        )
+        .from(".hero-body", {
+          opacity: 0,
+          y: 10,
+        })
+        .from(".hero-button", {
+          opacity: 0,
+          y: 10,
+          duration: 0.6,
+        });
 
       const scrollTl = gsap.timeline({
         scrollTrigger: {
+          trigger: ".hero",
           start: "top top",
           end: "bottom bottom",
           scrub: 1.5,
@@ -64,7 +79,7 @@ const Hero = ({ slice }: HeroProps): JSX.Element => {
             backgroundColor: "#FDE047",
           },
           {
-            backgroundColor: "#D9f99D",
+            backgroundColor: "#D9F99D",
             overwrite: "auto",
           },
           1,
