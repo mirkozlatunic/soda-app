@@ -9,11 +9,14 @@ import {
   SliceComponentProps,
 } from "@prismicio/react";
 import { Center, Environment, View } from "@react-three/drei";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ArrowIcon } from "./ArrowIcon";
 import clsx from "clsx";
 import { WavyCircles } from "./WavyCicrles";
+import { Group } from "three";
+import gsap from "gsap";
 
+const SPINS_ON_CHANGE = 8;
 const FLAVORS: {
   flavor: SodaCanProps["flavor"];
   color: string;
@@ -40,11 +43,40 @@ export type CarouselProps = SliceComponentProps<Content.CarouselSlice>;
  */
 const Carousel = ({ slice }: CarouselProps): JSX.Element => {
   const [currentFlavorIndex, setCurrentFlavorIndex] = useState(0);
+  const sodCanRef = useRef<Group>(null);
 
   function changeFlavor(index: number) {
+    if (!sodCanRef.current) return;
+
     const nextIndex = (index + FLAVORS.length) % FLAVORS.length;
 
-    setCurrentFlavorIndex(nextIndex);
+    const tl = gsap.timeline();
+
+    tl.to(
+      sodCanRef.current.rotation,
+      {
+        y:
+          index > currentFlavorIndex
+            ? `-=${Math.PI * 2 * SPINS_ON_CHANGE}`
+            : `-=${Math.PI * 2 * SPINS_ON_CHANGE}`,
+        ease: "power2.inOut",
+        duration: 1,
+      },
+      0,
+    )
+      .to(
+        ".background, .wavy-circles-outer, .wavy-circles-inner",
+        {
+          backgroundColor: FLAVORS[nextIndex].color,
+          fill: FLAVORS[nextIndex].color,
+          ease: "power2.inOut",
+          duration: 1,
+        },
+        0,
+      )
+      .to(".text-wrapper", { duration: 0.2, y: -10, opacity: 0 }, 0)
+      .to({}, { onStart: () => setCurrentFlavorIndex(nextIndex) }, 0.5)
+      .to(".text-wrapper", { duration: 0.2, y: 0, opacity: 1 }, 0.7);
   }
 
   return (
@@ -72,6 +104,7 @@ const Carousel = ({ slice }: CarouselProps): JSX.Element => {
         <View className="aspect-square h-[70vmin] min-h-40">
           <Center position={[0, 0, 1.5]}>
             <FloatingCan
+              ref={sodCanRef}
               floatIntesity={0.3}
               rotationIntesity={1}
               flavor={FLAVORS[currentFlavorIndex].flavor}
