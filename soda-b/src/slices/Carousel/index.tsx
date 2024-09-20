@@ -10,6 +10,8 @@ import {
 } from "@prismicio/react";
 import { Center, Environment, View } from "@react-three/drei";
 import { useState } from "react";
+import { ArrowIcon } from "./ArrowIcon";
+import clsx from "clsx";
 
 const FLAVORS: {
   flavor: SodaCanProps["flavor"];
@@ -58,12 +60,11 @@ const Carousel = ({ slice }: CarouselProps): JSX.Element => {
 
       <div className="grid grid-cols-[auto,auto,auto] items-center">
         {/* left */}
-        <button
+        <ArrowButton
           onClick={() => changeFlavor(currentFlavorIndex + 1)}
-          className="z-20"
-        >
-          Left
-        </button>
+          direction="left"
+          label="Previous Flavor"
+        ></ArrowButton>
         {/* Can */}
         <View className="aspect-square h-[70vmin] min-h-40">
           <Center position={[0, 0, 1.5]}>
@@ -82,16 +83,45 @@ const Carousel = ({ slice }: CarouselProps): JSX.Element => {
           <directionalLight intensity={6} position={[0, 1, 1]} />
         </View>
         {/* Right */}
-        <button
-          onClick={() => changeFlavor(currentFlavorIndex + 1)}
-          className="z-20"
-        >
-          Right
-        </button>
+        <ArrowButton
+          onClick={() => changeFlavor(currentFlavorIndex - 1)}
+          direction="right"
+          label="Next Flavor"
+        ></ArrowButton>
       </div>
-      <PrismicRichText field={slice.primary.price_copy} />
+
+      <div className="text-area relative mx-auto text-center">
+        <div className="text-wrapper text-4xl font-medium">
+          <p>{FLAVORS[currentFlavorIndex].name}</p>
+        </div>
+        <div className="mt-2 text-xl font-normal opacity-90">
+          <PrismicRichText field={slice.primary.price_copy} />
+        </div>
+      </div>
     </section>
   );
 };
 
 export default Carousel;
+
+type ArrowButtonProps = {
+  direction?: "right" | "left";
+  label: string;
+  onClick: () => void;
+};
+
+function ArrowButton({
+  label,
+  onClick,
+  direction = "right",
+}: ArrowButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className="size-12 rounded-full border-2 border-white bg-white/10 p-3 opacity-85 ring-white focus:outline-none focus-visible:opacity-100 focus-visible:ring-4 md:size-16 lg:size-20"
+    >
+      <ArrowIcon className={clsx(direction === "right" && "-scale-x-100")} />
+      <span className="sr-only">{label}</span>
+    </button>
+  );
+}
